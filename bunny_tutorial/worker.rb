@@ -13,14 +13,11 @@ q   =  ch.queue("hello")
 puts " [*] Waiting for messages in #{q.name}. To exit press CTRL+C"
 
 
-q.subscribe(:manual_ack => true, :block => true) do |delivery_info, properties, body|
+q.subscribe(manual_ack: true, block: true) do |delivery_info, properties, body|
   puts " [x] Received #{body}"
   # imitate some work
-  sleep body.count(".").to_i
+  sleep body.count(".").to_i*10
   puts " [x] Done"
-  binding.pry
-  
-  ch.ack(delivery_info.delivery_tag)
-  delivery_info.consumer.cancel
 
+  ch.ack(delivery_info.delivery_tag)
 end
