@@ -7,17 +7,22 @@ conn = Bunny.new
 conn.start
 
 ch  = conn.create_channel
-q   =  ch.queue("hello")
+q   =  ch.queue("hello", druable: true)
 
 
-puts " [*] Waiting for messages in #{q.name}. To exit press CTRL+C"
+ch.prefetch(1)
 
+puts " [*] Waiting for messages. To exit press CTRL+C"
 
-q.subscribe(manual_ack: true, block: true) do |delivery_info, properties, body|
-  puts " [x] Received #{body}"
-  # imitate some work
-  sleep body.count(".").to_i*10
-  puts " [x] Done"
+begin
+  q.subscribe(manual_ack: true, block: true) do |delivery_info, properties, body|
+    puts " [x] Received #{body}"
+    # imitate some work
+    sleep body.count(".").to_i
+    puts " [x] Done"
 
-  ch.ack(delivery_info.delivery_tag)
+    ch.ack(delivery_info.delivery_tag)
+  end
+rescue Interrupt => _
+  conn.close
 end
