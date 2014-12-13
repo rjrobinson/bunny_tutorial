@@ -1,0 +1,26 @@
+require 'bunny'
+require 'pry'
+
+
+conn = Bunny.new
+
+conn.start
+
+ch  = conn.create_channel
+q   =  ch.queue("hello")
+
+
+puts " [*] Waiting for messages in #{q.name}. To exit press CTRL+C"
+
+
+q.subscribe(:manual_ack => true, :block => true) do |delivery_info, properties, body|
+  puts " [x] Received #{body}"
+  # imitate some work
+  sleep body.count(".").to_i
+  puts " [x] Done"
+  binding.pry
+  
+  ch.ack(delivery_info.delivery_tag)
+  delivery_info.consumer.cancel
+
+end

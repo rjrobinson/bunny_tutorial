@@ -1,8 +1,6 @@
 require 'bunny'
 
-
 # a test using the Bunny gem to connect to a RabbitMQ server
-
 
 conn = Bunny.new
 
